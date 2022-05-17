@@ -1,0 +1,11 @@
+<html>
+    <div>
+        {% for item in articles %}
+        <li>
+            <a href="/article/edit/{{item.id}}">{{item.title}}</a>
+            {{item.content}}    
+            <a href="{% url 'article:article_delete_url' id=item.id %}" method=post>Sil</a>
+        </li>
+        {% endfor %}
+    </div>
+</html>
