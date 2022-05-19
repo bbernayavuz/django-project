@@ -2,6 +2,7 @@ from django.http import HttpResponse
 from django.shortcuts import redirect, render, get_object_or_404
 
 from article.models import Article
+from article.forms import ArticleForm
 
 # bunun amacı articleları .all() listelemek ve her
 # birine link verip edit sayfasına yönlendirmek
@@ -16,13 +17,24 @@ def article_index(request):
 
 # bunun tek amacı yeni article olustur formunu render etmek
 def article_new_form(request):
-    return render(request, 'new_article.html')
+    form = ArticleForm(request.POST or None)
+    context = {
+        'form': form,
+    }
+    return render(request, 'new_article.html', context)
  
 # bu POST ile bu methoda taşınan veriyi
 # DB'ye kaydedip listeleme sayfasına döndürecek
+
 def article_create(request):
-    created_article = Article.objects.create(title=request.POST['title'], content=request.POST['content'])
-    return redirect('/article/index')
+    form = ArticleForm(request.POST or None)
+    if form.is_valid():
+        form.save()
+        return redirect('/article/index')
+
+    
+ #   created_article = Article.objects.create(title=request.POST['title'], content=request.POST['content'])
+#    return redirect('/article/index')
 
 # bunun amacı /article/bilmemne şeklinde gelen id'yi alıp
 # DB'den çekip, formu render ederken içine vermek.
@@ -56,6 +68,5 @@ def article_update(request, id):
    
 
 def article_delete(request, id):
-    article = Article.objects.get(id=id)
-    article.delete()
+    Article.objects.get(id=id).delete()
     return redirect('/article/index')
